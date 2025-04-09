@@ -21,7 +21,10 @@ import ViewCounter from '@/components/article/ViewCounter';
 
 
 // Pour l'optimisation des métadonnées dynamiques (SEO)
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata(
+  props: { params: { slug: string } }
+): Promise<Metadata>  {
+  const { params } = props;
   const article = await getArticleBySlug(params.slug);
   
   if (!article) {
