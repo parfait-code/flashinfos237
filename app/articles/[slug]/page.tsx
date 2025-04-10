@@ -18,7 +18,7 @@ import { FaClock, FaEye } from 'react-icons/fa';
 import './articleContent.css';
 // Importez le composant ViewCounter
 import ViewCounter from '@/components/article/ViewCounter';
-import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
+import { ParsedUrlQuery } from 'querystring';
 
 
 // Pour l'optimisation des métadonnées dynamiques (SEO)
@@ -73,9 +73,12 @@ async function getArticleBySlug(slug: string) {
 }
 
 // Page principale
-export default async function ArticlePage({ params }: { params: Params }) {
+export default async function ArticlePage({ params }: { params: ParsedUrlQuery }) {
   const { slug } = params;
   // Récupérer les données nécessaires
+  if (typeof slug !== 'string') {
+    throw new Error('Invalid slug');
+  }
   const article = await getArticleBySlug(slug);
   
   if (!article) {
