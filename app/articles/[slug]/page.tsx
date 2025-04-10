@@ -11,7 +11,7 @@ import CommentService from '@/services/firebase/commentService';
 import TagList from '@/components/article/TagList';
 import RelatedArticles from '@/components/article/RelatedArticles';
 import ShareButtons from '@/components/article/ShareButtons';
-import { Metadata } from 'next';
+// import { Metadata } from 'next';
 import { CommentsSection } from '@/components/comment/CommentsSection';
 import Link from 'next/link';import { HiCalendarDateRange } from 'react-icons/hi2';
 import { FaClock, FaEye } from 'react-icons/fa';
@@ -21,31 +21,31 @@ import ViewCounter from '@/components/article/ViewCounter';
 
 
 // Pour l'optimisation des métadonnées dynamiques (SEO)
-export async function generateMetadata({
-  params
-}: {
-  params: { slug: string }
-}): Promise<Metadata> {
-  const article = await getArticleBySlug(params.slug);
+// export async function generateMetadata({
+//   params
+// }: {
+//   params: { slug: string }
+// }): Promise<Metadata> {
+//   const article = await getArticleBySlug(params.slug);
   
-  if (!article) {
-    return {
-      title: 'Article non trouvé | FlashInfos237'
-    };
-  }
+//   if (!article) {
+//     return {
+//       title: 'Article non trouvé | FlashInfos237'
+//     };
+//   }
 
-  return {
-    title: `${article.title} | FlashInfos237`,
-    description: article.summary,
-    openGraph: {
-      title: article.title,
-      description: article.summary,
-      images: [{ url: article.imageUrl }],
-      type: 'article',
-      publishedTime: article.publishedAt?.toISOString(),
-    }
-  };
-}
+//   return {
+//     title: `${article.title} | FlashInfos237`,
+//     description: article.summary,
+//     openGraph: {
+//       title: article.title,
+//       description: article.summary,
+//       images: [{ url: article.imageUrl }],
+//       type: 'article',
+//       publishedTime: article.publishedAt?.toISOString(),
+//     }
+//   };
+// }
 
 // Fonction pour récupérer un article par son slug
 async function getArticleBySlug(slug: string) {
