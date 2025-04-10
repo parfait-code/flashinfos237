@@ -18,14 +18,14 @@ import { FaClock, FaEye } from 'react-icons/fa';
 import './articleContent.css';
 // Importez le composant ViewCounter
 import ViewCounter from '@/components/article/ViewCounter';
-import { ParsedUrlQuery } from 'querystring';
 
 
 // Pour l'optimisation des métadonnées dynamiques (SEO)
-export async function generateMetadata(
-  props: { params: { slug: string } }
-): Promise<Metadata>  {
-  const { params } = props;
+export async function generateMetadata({
+  params
+}: {
+  params: { slug: string }
+}): Promise<Metadata> {
   const article = await getArticleBySlug(params.slug);
   
   if (!article) {
@@ -73,7 +73,7 @@ async function getArticleBySlug(slug: string) {
 }
 
 // Page principale
-export default async function ArticlePage({ params }: { params: ParsedUrlQuery }) {
+export default async function ArticlePage({ params }: { params: { slug: string } }) {
   const { slug } = params;
   // Récupérer les données nécessaires
   if (typeof slug !== 'string') {
