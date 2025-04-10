@@ -18,6 +18,7 @@ import { FaClock, FaEye } from 'react-icons/fa';
 import './articleContent.css';
 // Importez le composant ViewCounter
 import ViewCounter from '@/components/article/ViewCounter';
+import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 
 
 // Pour l'optimisation des métadonnées dynamiques (SEO)
@@ -72,9 +73,10 @@ async function getArticleBySlug(slug: string) {
 }
 
 // Page principale
-export default async function ArticlePage({ params }: { params: { slug: string } }) {
+export default async function ArticlePage({ params }: { params: Params }) {
+  const { slug } = params;
   // Récupérer les données nécessaires
-  const article = await getArticleBySlug(params.slug);
+  const article = await getArticleBySlug(slug);
   
   if (!article) {
     // Gérer le cas où l'article n'existe pas
