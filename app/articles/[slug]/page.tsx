@@ -19,7 +19,6 @@ import ShareButtons from '@/components/article/ShareButtons';
 import CommentForm from '@/components/comment/CommentForm';
 import ArticleRelated from '@/components/article/ArticleRelated';
 import Loader from '@/components/loader';
-import ViewCounter from '@/components/article/ViewCounter';
 
 export default function ArticleDetailPage() {
   const params = useParams();
@@ -95,6 +94,53 @@ export default function ArticleDetailPage() {
     }
   }, [slug]);
 
+  useEffect(() => {
+    async function fetchArticleData() {
+      try {
+        setLoading(true);
+        
+        // Récupérer tous les articles pour trouver celui avec le slug correspondant
+        const { articles } = await articleService.getArticles({
+          status: ArticleStatus.PUBLISHED,
+          limit: 100
+        });
+        
+        const foundArticle = articles.find(article => article.slug === slug);
+        
+        if (!foundArticle) {
+          setError('Article non trouvé');
+          setLoading(false);
+          return;
+        }
+        
+        setArticle(foundArticle);
+        
+        // Vérifier si l'article a déjà été vu dans cette session
+        const viewedArticles = JSON.parse(localStorage.getItem('viewedArticles') || '{}');
+        const hasBeenViewed = viewedArticles[foundArticle.id];
+        
+        if (!hasBeenViewed) {
+          // Incrémenter le compteur de vues seulement si pas encore vu
+          await articleService.incrementViewCount(foundArticle.id);
+          
+          // Marquer l'article comme vu
+          viewedArticles[foundArticle.id] = true;
+          localStorage.setItem('viewedArticles', JSON.stringify(viewedArticles));
+        }
+        
+        // Reste du code inchangé...
+      } catch (err) {
+        // ...gestion d'erreur inchangée
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    if (slug) {
+      fetchArticleData();
+    }
+  }, [slug]);
+  
   if (error) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -119,7 +165,6 @@ export default function ArticleDetailPage() {
 
   return (
     <>
-    <ViewCounter articleId={article.id} />
     <div className=" mx-auto px-4 py-10 container">
       {/* Bouton de retour */}
       <div className="mb-8">
@@ -174,7 +219,7 @@ export default function ArticleDetailPage() {
         
         <div className="flex items-center">
           <FiMessageSquare className="mr-2 text-blue-500" />
-          <span>{article.commentCount} commentaires</span>
+          <span>{comments.length } commentaires</span>
         </div>
       </div>
       

@@ -190,5 +190,24 @@ export const articleService = {
       console.error('Error updating article featured status:', error);
       throw error;
     }
+  },
+
+    // Incrémenter le compteur de vues d'un article
+  async incrementViewCount(id: string): Promise<void> {
+    try {
+      const docRef = doc(db, COLLECTION_NAME, id);
+      const articleDoc = await getDoc(docRef);
+      
+      if (articleDoc.exists()) {
+        const currentViewCount = articleDoc.data().viewCount || 0;
+        await updateDoc(docRef, {
+          viewCount: currentViewCount + 1,
+          updatedAt: new Date()
+        });
+      }
+    } catch (error) {
+      console.error('Error incrementing view count:', error);
+      throw error;
+    }
   }
 };
