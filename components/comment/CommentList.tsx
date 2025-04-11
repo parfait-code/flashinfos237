@@ -1,6 +1,6 @@
 // components/comments/CommentsList.tsx
 import React from 'react';
-import { FiUser, FiCalendar, FiThumbsUp, FiMessageSquare } from 'react-icons/fi';
+import { FiCalendar, FiThumbsUp, FiMessageSquare } from 'react-icons/fi';
 import { Comment } from '@/types/comment';
 import { formatDate } from '@/utils/helpers';
 
@@ -110,7 +110,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ comments }) => {
       {parentComments.length === 0 ? (
         <div className="bg-gray-50 text-gray-500 text-center py-10 rounded-xl border border-dashed border-gray-300">
           <FiMessageSquare className="mx-auto text-3xl mb-3 text-gray-400" />
-          <p className="font-medium">Il n'y a pas encore de commentaires.</p>
+          <p className="font-medium">Il n&apos;y a pas encore de commentaires.</p>
           <p className="text-sm mt-1">Soyez le premier à partager votre avis !</p>
         </div>
       ) : (

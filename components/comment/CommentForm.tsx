@@ -73,8 +73,8 @@ const CommentForm: React.FC<CommentFormProps> = ({ articleId, parentId = null })
         <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-100 flex items-start gap-3">
           <FiAlertCircle className="text-red-500 text-xl mt-0.5 flex-shrink-0" />
           <div>
-            <p className="font-medium">Oups, une erreur s'est produite</p>
-            <p className="text-sm">Veuillez réessayer plus tard ou contacter l'administrateur du site.</p>
+            <p className="font-medium">Oups, une erreur s&apos;est produite</p>
+            <p className="text-sm">Veuillez réessayer plus tard ou contacter l&apos;administrateur du site.</p>
           </div>
         </div>
       )}

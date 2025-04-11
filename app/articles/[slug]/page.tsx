@@ -130,6 +130,7 @@ export default function ArticleDetailPage() {
         
         // Reste du code inchangé...
       } catch (err) {
+        console.log(err)
         // ...gestion d'erreur inchangée
       } finally {
         setLoading(false);
@@ -140,7 +141,7 @@ export default function ArticleDetailPage() {
       fetchArticleData();
     }
   }, [slug]);
-  
+
   if (error) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
