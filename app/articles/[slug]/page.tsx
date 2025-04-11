@@ -19,6 +19,7 @@ import ShareButtons from '@/components/article/ShareButtons';
 import CommentForm from '@/components/comment/CommentForm';
 import ArticleRelated from '@/components/article/ArticleRelated';
 import Loader from '@/components/loader';
+import ViewCounter from '@/components/article/ViewCounter';
 
 export default function ArticleDetailPage() {
   const params = useParams();
@@ -117,6 +118,8 @@ export default function ArticleDetailPage() {
   }
 
   return (
+    <>
+    <ViewCounter articleId={article.id} />
     <div className=" mx-auto px-4 py-10 container">
       {/* Bouton de retour */}
       <div className="mb-8">
@@ -308,5 +311,6 @@ export default function ArticleDetailPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
