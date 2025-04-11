@@ -1,6 +1,5 @@
 // components/PopularArticlesCarousel.tsx
 import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
 import { Article } from '@/types/article';
 import { Category } from '@/types/category';
 import ArticleCard from '@/components/ArticleCard';

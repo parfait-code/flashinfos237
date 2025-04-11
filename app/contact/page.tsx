@@ -4,7 +4,7 @@
 import { useState, FormEvent } from 'react';
 import Image from 'next/image';
 import { contactService } from '@/services/firebase/contactService';
-import { FiMessageCircle, FiSend } from 'react-icons/fi';
+import { FiSend } from 'react-icons/fi';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
