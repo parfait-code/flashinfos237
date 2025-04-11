@@ -2,10 +2,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter, notFound } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FiCalendar, FiUser, FiEye, FiMessageSquare, FiHeart, FiShare2 } from 'react-icons/fi';
+import './articleContent.css'
+import { FiCalendar, FiUser, FiEye, FiMessageSquare, FiHeart, FiShare2, FiArrowLeft } from 'react-icons/fi';
 import { articleService } from '@/services/firebase/articleService';
 import { CommentService } from '@/services/firebase/commentService';
 import { categoryService } from '@/services/firebase/categoryService';
@@ -96,13 +97,14 @@ export default function ArticleDetailPage() {
   if (error) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
-        <div className="bg-red-50 text-red-800 p-4 rounded-lg shadow max-w-md w-full">
-          <h2 className="text-xl font-bold mb-2">Erreur</h2>
-          <p>{error}</p>
+        <div className="bg-red-50 text-red-800 p-6 rounded-xl shadow-lg max-w-md w-full">
+          <h2 className="text-2xl font-bold mb-3">Erreur</h2>
+          <p className="mb-4">{error}</p>
           <button 
             onClick={() => router.push('/')}
-            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+            className="mt-2 px-5 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all flex items-center gap-2 shadow-sm"
           >
+            <FiArrowLeft />
             Retour à l&apos;accueil
           </button>
         </div>
@@ -115,15 +117,30 @@ export default function ArticleDetailPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className=" mx-auto px-4 py-10 container">
+      {/* Bouton de retour */}
+      <div className="mb-8">
+        <button 
+          onClick={() => router.back()}
+          className="flex items-center text-gray-600 hover:text-blue-600 transition"
+        >
+          <FiArrowLeft className="mr-2" />
+          <span>Retour</span>
+        </button>
+      </div>
+      
       {/* Barre de navigation des catégories */}
-      <div className="mb-6 flex flex-wrap gap-2">
+      <div className="mb-8 flex flex-wrap gap-2">
         {categories.map(category => (
           <Link 
             key={category?.id} 
             href={`/categories/${category?.slug}`}
-            className={`text-xs px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 transition`}
-            style={{ backgroundColor: category?.color ? `${category.color}20` : undefined }}
+            className="text-xs font-medium px-4 py-1.5 rounded-full transition-all hover:shadow-md"
+            style={{ 
+              backgroundColor: category?.color ? `${category.color}20` : undefined,
+              color: category?.color || 'inherit',
+              border: `1px solid ${category?.color}50` || 'inherit'
+            }}
           >
             {category?.name}
           </Link>
@@ -131,74 +148,75 @@ export default function ArticleDetailPage() {
       </div>
       
       {/* Titre de l'article */}
-      <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+      <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight text-gray-900">
         {article.title}
       </h1>
       
       {/* Métadonnées de l'article */}
-      <div className="flex flex-wrap items-center gap-4 text-gray-600 mb-8">
+      <div className="flex flex-wrap items-center gap-6 text-gray-600 mb-10">
         <div className="flex items-center">
-          <FiCalendar className="mr-1" />
+          <FiCalendar className="mr-2 text-blue-500" />
           <span>{formatDate(article.publishedAt)}</span>
         </div>
         
         <div className="flex items-center">
-          <FiUser className="mr-1" />
+          <FiUser className="mr-2 text-blue-500" />
           <span>{article.authorName}</span>
         </div>
         
         <div className="flex items-center">
-          <FiEye className="mr-1" />
+          <FiEye className="mr-2 text-blue-500" />
           <span>{article.viewCount} vues</span>
         </div>
         
         <div className="flex items-center">
-          <FiMessageSquare className="mr-1" />
+          <FiMessageSquare className="mr-2 text-blue-500" />
           <span>{article.commentCount} commentaires</span>
         </div>
       </div>
       
-      {/* Image principale */}
-      <div className="relative w-full h-[40vh] md:h-[60vh] mb-8 rounded-lg overflow-hidden">
+      {/* Image principale avec overlay */}
+      <div className="relative w-full h-[40vh] md:h-[60vh] mb-12 rounded-xl overflow-hidden shadow-xl">
         <Image 
           src={article.imageUrl} 
           alt={article.title} 
           fill
-          className="object-cover"
+          className="object-cover transition-transform hover:scale-105 duration-700"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
           priority
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
         {article.imageCredit && (
-          <div className="absolute bottom-0 right-0 bg-black bg-opacity-50 text-white text-xs p-2">
+          <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white text-xs px-3 py-1.5 rounded-full">
             Crédit: {article.imageCredit}
           </div>
         )}
       </div>
       
       {/* Contenu de l'article */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
         <div className="lg:col-span-3">
           {/* Résumé */}
-          <div className="font-medium text-xl text-gray-700 mb-6 italic">
+          <div className="font-medium text-xl text-gray-700 mb-8 italic border-l-4 border-blue-500 pl-6 py-2">
             {article.summary}
           </div>
           
           {/* Contenu principal */}
           <div 
-            className="prose prose-lg max-w-none mb-12"
+            className="prose prose-lg article-content max-w-none mb-16 prose-headings:text-gray-800 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg prose-img:shadow-md"
             dangerouslySetInnerHTML={{ __html: article.content }}
           />
           
           {/* Tags */}
           {article.tags && article.tags.length > 0 && (
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold mb-2">Tags</h3>
+            <div className="mb-10">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">Tags</h3>
               <div className="flex flex-wrap gap-2">
                 {article.tags.map(tag => (
                   <Link 
                     key={tag} 
                     href={`/tags/${tag}`}
-                    className="text-sm px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 transition"
+                    className="text-sm px-4 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition border border-gray-200 text-gray-700 hover:shadow-sm"
                   >
                     #{tag}
                   </Link>
@@ -209,16 +227,16 @@ export default function ArticleDetailPage() {
           
           {/* Sources */}
           {article.sources && article.sources.length > 0 && (
-            <div className="mb-12">
-              <h3 className="text-lg font-semibold mb-2">Sources</h3>
-              <ul className="list-disc pl-5">
+            <div className="mb-16 bg-gray-50 p-6 rounded-xl border border-gray-200">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">Sources</h3>
+              <ul className="list-disc pl-6 space-y-2">
                 {article.sources.map((source, index) => (
                   <li key={index}>
                     <a 
                       href={source.url} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
+                      className="text-blue-600 hover:underline hover:text-blue-800 transition"
                     >
                       {source.name}
                     </a>
@@ -229,14 +247,14 @@ export default function ArticleDetailPage() {
           )}
           
           {/* Boutons de partage */}
-          <div className="flex items-center justify-between border-t border-b py-4 mb-8">
-            <div className="flex items-center gap-4">
-              <button className="flex items-center gap-1 text-gray-600 hover:text-red-500">
-                <FiHeart />
+          <div className="flex items-center justify-between border-t border-b border-gray-200 py-6 mb-12">
+            <div className="flex items-center gap-6">
+              <button className="flex items-center gap-2 text-gray-600 hover:text-red-500 transition group">
+                <FiHeart className="group-hover:scale-110 transition" />
                 <span>{article.likeCount}</span>
               </button>
-              <button className="flex items-center gap-1 text-gray-600 hover:text-blue-500">
-                <FiShare2 />
+              <button className="flex items-center gap-2 text-gray-600 hover:text-blue-500 transition group">
+                <FiShare2 className="group-hover:scale-110 transition" />
                 <span>{article.shareCount}</span>
               </button>
             </div>
@@ -250,14 +268,14 @@ export default function ArticleDetailPage() {
           
           {/* Commentaires */}
           <div className="mt-12">
-            <h2 className="text-2xl font-bold mb-6">
+            <h2 className="text-2xl font-bold mb-8 text-gray-800 border-b pb-4">
               Commentaires ({comments.length})
             </h2>
             
             <CommentsList comments={comments} />
             
-            <div className="mt-8">
-              <h3 className="text-xl font-semibold mb-4">Laisser un commentaire</h3>
+            <div className="mt-10 bg-gray-50 rounded-xl p-8 border border-gray-200">
+              <h3 className="text-xl font-semibold mb-6 text-gray-800">Laisser un commentaire</h3>
               <CommentForm articleId={article.id} />
             </div>
           </div>
@@ -266,23 +284,25 @@ export default function ArticleDetailPage() {
         {/* Sidebar */}
         <div className="lg:col-span-1">
           {/* À propos de l'auteur */}
-          <div className="bg-gray-50 p-6 rounded-lg mb-6">
-            <h3 className="text-lg font-semibold mb-2">À propos de l'auteur</h3>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-full bg-gray-300"></div>
+          <div className="bg-white p-6 rounded-xl mb-8 shadow-md border border-gray-100">
+            <h3 className="text-lg font-semibold mb-4 text-gray-800">À propos de l'auteur</h3>
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-lg font-bold">
+                {article.authorName.charAt(0).toUpperCase()}
+              </div>
               <div>
-                <div className="font-medium">{article.authorName}</div>
-                <div className="text-sm text-gray-600">Auteur</div>
+                <div className="font-medium text-lg">{article.authorName}</div>
+                <div className="text-sm text-gray-500">Auteur</div>
               </div>
             </div>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 italic border-l-2 border-blue-300 pl-3">
               Biographie de l'auteur à compléter...
             </p>
           </div>
           
           {/* Articles similaires */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Articles similaires</h3>
+          <div className="sticky top-6">
+            <h3 className="text-lg font-semibold mb-6 text-gray-800 pb-2 border-b">Articles similaires</h3>
             <ArticleRelated articles={relatedArticles} />
           </div>
         </div>
