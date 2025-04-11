@@ -1,52 +1,100 @@
-
-// components/comment/CommentList.tsx
+// components/comments/CommentsList.tsx
+import React from 'react';
+import { FiUser, FiCalendar, FiThumbsUp } from 'react-icons/fi';
 import { Comment } from '@/types/comment';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { FiThumbsUp } from 'react-icons/fi';
+import { formatDate } from '@/utils/helpers';
 
-interface CommentListProps {
+interface CommentsListProps {
   comments: Comment[];
 }
 
-export default function CommentList({ comments }: CommentListProps) {
-  if (comments.length === 0) {
-    return (
-      <div className="text-center py-10 text-gray-500">
-        Aucun commentaire pour le moment. Soyez le premier à réagir!
-      </div>
-    );
-  }
+const CommentsList: React.FC<CommentsListProps> = ({ comments }) => {
+  // Organiser les commentaires en structure hiérarchique
+  const organizeComments = (comments: Comment[]): {
+    parentComments: Comment[];
+    childrenMap: Record<string, Comment[]>;
+  } => {
+    const parentComments: Comment[] = [];
+    const childrenMap: Record<string, Comment[]> = {};
 
-  return (
-    <div className="space-y-6 mt-8">
-      {comments.map((comment) => (
-        <div key={comment.id} className="border-b border-gray-200 pb-6 last:border-0">
-          <div className="flex items-start">
-            <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden flex-shrink-0">
-              <span className="text-lg font-bold text-gray-700">
-                {comment.userName.charAt(0).toUpperCase()}
-              </span>
+    comments.forEach((comment) => {
+      if (!comment.parentId) {
+        // C'est un commentaire parent
+        parentComments.push(comment);
+      } else {
+        // C'est une réponse
+        if (!childrenMap[comment.parentId]) {
+          childrenMap[comment.parentId] = [];
+        }
+        childrenMap[comment.parentId].push(comment);
+      }
+    });
+
+    // Trier par date de création (du plus récent au plus ancien)
+    parentComments.sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    for (const parentId in childrenMap) {
+      childrenMap[parentId].sort((a, b) => 
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      );
+    }
+
+    return { parentComments, childrenMap };
+  };
+
+  const { parentComments, childrenMap } = organizeComments(comments);
+
+  // Composant récursif pour afficher un commentaire et ses réponses
+  const CommentItem = ({ comment, depth = 0 }: { comment: Comment; depth?: number }) => {
+    const replies = childrenMap[comment.id] || [];
+
+    return (
+      <div className={`${depth > 0 ? 'ml-6 pl-6 border-l border-gray-200' : ''}`}>
+        <div className="bg-white p-4 rounded-lg mb-4">
+          <div className="flex justify-between mb-2">
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 mr-2">
+                <FiUser />
+              </div>
+              <span className="font-medium">{comment.userName}</span>
             </div>
-            <div className="ml-4 flex-1">
-              <div className="flex items-center justify-between mb-1">
-                <h4 className="font-medium text-gray-900">{comment.userName}</h4>
-                <span className="text-sm text-gray-500">
-                  {format(new Date(comment.createdAt), 'dd MMM yyyy, HH:mm', { locale: fr })}
-                </span>
-              </div>
-              <p className="text-gray-700 whitespace-pre-line">{comment.content}</p>
-              
-              <div className="flex items-center mt-3 text-sm">
-                <button className="flex items-center text-gray-500 hover:text-red-600 transition">
-                  <FiThumbsUp className="mr-1" /> 
-                  <span>J&apos;aime{comment.likes > 0 ? ` (${comment.likes})` : ''}</span>
-                </button>
-              </div>
+            <div className="flex items-center text-sm text-gray-500">
+              <FiCalendar className="mr-1" />
+              <span>{formatDate(comment.createdAt)}</span>
             </div>
           </div>
+          <div className="text-gray-700 mb-2">{comment.content}</div>
+          <div className="flex items-center text-sm text-gray-500">
+            <button className="flex items-center hover:text-blue-500">
+              <FiThumbsUp className="mr-1" />
+              <span>{comment.likes}</span>
+            </button>
+          </div>
         </div>
-      ))}
+
+        {/* Afficher les réponses de manière récursive */}
+        {replies.map((reply) => (
+          <CommentItem key={reply.id} comment={reply} depth={depth + 1} />
+        ))}
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-4">
+      {parentComments.length === 0 ? (
+        <p className="text-gray-500 text-center py-4">
+          Il n'y a pas encore de commentaires. Soyez le premier à commenter !
+        </p>
+      ) : (
+        parentComments.map((comment) => (
+          <CommentItem key={comment.id} comment={comment} />
+        ))
+      )}
     </div>
   );
-}
+};
+
+export default CommentsList;
