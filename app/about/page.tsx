@@ -131,7 +131,7 @@ export default function AboutPage() {
               Notre équipe est composée de journalistes professionnels, d&apos;analystes et d&apos;experts dans divers domaines, tous unis par la passion de l&apos;information de qualité. Forts de leur expérience acquise dans les médias nationaux et internationaux, nos rédacteurs apportent une perspective unique et approfondie sur l&apos;actualité camerounaise et internationale.
             </p>
             <p className="mb-4">
-              De la politique à l&apos;économie, en passant par le sport, la culture et les nouvelles technologies, nos spécialistes travaillent sans relâche pour vous offrir une couverture complète et nuancée de tout ce qui fait l&apos;actualité au Cameroun et a l'internationale.
+              De la politique à l&apos;économie, en passant par le sport, la culture et les nouvelles technologies, nos spécialistes travaillent sans relâche pour vous offrir une couverture complète et nuancée de tout ce qui fait l&apos;actualité au Cameroun et a l&apos;internationale.
             </p>
           </div>
         </section>
