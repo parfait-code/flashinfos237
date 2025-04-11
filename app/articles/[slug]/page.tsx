@@ -284,7 +284,7 @@ export default function ArticleDetailPage() {
         {/* Sidebar */}
         <div className="lg:col-span-1">
           {/* À propos de l'auteur */}
-          <div className="bg-white p-6 rounded-xl mb-8 shadow-md border border-gray-100">
+          {/* <div className="bg-white p-6 rounded-xl mb-8 shadow-md border border-gray-100">
             <h3 className="text-lg font-semibold mb-4 text-gray-800">À propos de l'auteur</h3>
             <div className="flex items-center gap-4 mb-4">
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-lg font-bold">
@@ -298,7 +298,7 @@ export default function ArticleDetailPage() {
             <p className="text-sm text-gray-600 italic border-l-2 border-blue-300 pl-3">
               Biographie de l'auteur à compléter...
             </p>
-          </div>
+          </div> */}
           
           {/* Articles similaires */}
           <div className="sticky top-6">
