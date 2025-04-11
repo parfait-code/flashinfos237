@@ -11,7 +11,7 @@ import { Category } from '@/types/category';
 import { formatDate } from '@/utils/helpers';
 import ArticleCard from '@/components/ArticleCard';
 import Loader from '@/components/loader';
-
+import PopularArticlesCarousel from '@/components/PopularArticlesCarousel';
 
 export default function HomePage() {
   const [featuredArticles, setFeaturedArticles] = useState<Article[]>([]);
@@ -24,15 +24,10 @@ export default function HomePage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   
-  // État pour le carrousel principal
+  // États pour le carrousel principal
   const [currentSlide, setCurrentSlide] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
-  
-  // État pour le carrousel des articles populaires
-  const [popularCurrentSlide, setPopularCurrentSlide] = useState(0);
-  const popularCarouselRef = useRef<HTMLDivElement>(null);
-  const popularAutoPlayRef = useRef<NodeJS.Timeout | null>(null);
 
   // Charger les données initiales
   useEffect(() => {
@@ -79,7 +74,7 @@ export default function HomePage() {
     fetchInitialData();
   }, []);
 
-  // Fonction pour charger les autres articles (ceux qui ne sont pas déjà affichés)
+  // Fonction pour charger les autres articles
   const fetchOtherArticles = async (featured: Article[], popular: Article[], latest: Article[]) => {
     try {
       // Créer une liste des IDs d'articles déjà affichés
@@ -88,11 +83,6 @@ export default function HomePage() {
         ...popular.map(a => a.id),
         ...latest.map(a => a.id)
       ];
-
-      // Requête pour obtenir tous les autres articles
-      // Note: Firebase ne supporte pas directement "not in" pour les tableaux de grande taille
-      // Pour une implémentation complète, il faudrait paginer et filtrer côté client
-      // ou implémenter une logique côté serveur
       
       const { articles: others, lastVisible: lastDoc } = await articleService.getArticles({
         status: ArticleStatus.PUBLISHED,
@@ -115,7 +105,7 @@ export default function HomePage() {
       const startAutoPlay = () => {
         autoPlayRef.current = setInterval(() => {
           setCurrentSlide((prev) => (prev + 1) % featuredArticles.length);
-        }, 5000); // Change de slide toutes les 5 secondes
+        }, 5000);
       };
 
       startAutoPlay();
@@ -127,25 +117,6 @@ export default function HomePage() {
       };
     }
   }, [featuredArticles.length]);
-  
-  // Configuration du carrousel des articles populaires avec autoplay
-  useEffect(() => {
-    if (popularArticles.length > 0) {
-      const startAutoPlay = () => {
-        popularAutoPlayRef.current = setInterval(() => {
-          setPopularCurrentSlide((prev) => (prev + 1) % Math.ceil(popularArticles.length / 3));
-        }, 7000); // Change de slide toutes les 7 secondes
-      };
-
-      startAutoPlay();
-
-      return () => {
-        if (popularAutoPlayRef.current) {
-          clearInterval(popularAutoPlayRef.current);
-        }
-      };
-    }
-  }, [popularArticles.length]);
 
   // Fonctions pour le contrôle du carrousel principal
   const goToSlide = (index: number) => {
@@ -165,26 +136,6 @@ export default function HomePage() {
 
   const goToNextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % featuredArticles.length);
-  };
-  
-  // Fonctions pour le contrôle du carrousel des articles populaires
-  const goToPopularSlide = (index: number) => {
-    setPopularCurrentSlide(index);
-    // Réinitialiser l'autoplay
-    if (popularAutoPlayRef.current) {
-      clearInterval(popularAutoPlayRef.current);
-      popularAutoPlayRef.current = setInterval(() => {
-        setPopularCurrentSlide((prev) => (prev + 1) % Math.ceil(popularArticles.length / 3));
-      }, 7000);
-    }
-  };
-
-  const goToPrevPopularSlide = () => {
-    setPopularCurrentSlide((prev) => (prev === 0 ? Math.ceil(popularArticles.length / 3) - 1 : prev - 1));
-  };
-
-  const goToNextPopularSlide = () => {
-    setPopularCurrentSlide((prev) => (prev + 1) % Math.ceil(popularArticles.length / 3));
   };
 
   const loadMoreArticles = async () => {
@@ -239,51 +190,62 @@ export default function HomePage() {
   };
 
   if (loading) {
-    return (
-      <Loader/>
-    );
+    return <Loader />;
   }
 
   return (
-    <div>
-      {/* Hero Section avec carrousel - Inchangé */}
+    <div className="bg-gray-50 min-h-screen">
+      {/* Hero Section avec carrousel - Modernisé */}
       {featuredArticles.length > 0 && (
-        <section className="container mx-auto px-4 mb-12">
+        <section className="pt-4 pb-12 px-4 lg:pt-6 lg:pb-16 max-w-7xl mx-auto">
           <div className="relative">
             {/* Carrousel principal */}
             <div 
               ref={carouselRef}
-              className="relative overflow-hidden rounded-xl h-[500px] shadow-xl"
+              className="relative overflow-hidden rounded-2xl h-[400px] sm:h-[500px] shadow-2xl"
             >
-              <div className="flex transition-transform duration-500 ease-out h-full" 
-                style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
+              <div 
+                className="flex h-full transition-transform duration-700 ease-in-out" 
+                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+              >
                 {featuredArticles.map((article, index) => (
                   <div key={article.id} className="min-w-full h-full relative">
-                    <Link href={`/articles/${article.slug}`}>
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/80 z-10 rounded-xl"></div>
-                    <Image 
-                      src={article.imageUrl || '/image.svg'} 
-                      alt={article.title}
-                      layout="fill"
-                      objectFit="cover"
-                      priority={index === 0}
-                    />
-                      <span className="absolute inset-0 z-20 p-8 flex flex-col justify-end">
-                        <div className="bg-green-700 text-white px-3 py-1 rounded-full text-xs uppercase font-medium w-fit mb-3">
+                    <Link href={`/articles/${article.slug}`} className="block h-full">
+                      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/90 z-10 rounded-2xl"></div>
+                      <Image 
+                        src={article.imageUrl || '/image.svg'} 
+                        alt={article.title}
+                        fill
+                        className="object-cover transition-transform duration-500 hover:scale-105"
+                        priority={index === 0}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                      />
+                      <span className="absolute inset-0 z-20 p-6 md:p-10 flex flex-col justify-end">
+                        <div className="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-1.5 rounded-full text-xs uppercase font-bold w-fit mb-4 tracking-wider shadow-md">
                           À la une
                         </div>
-                        <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 line-clamp-3">
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-3 line-clamp-3 leading-tight">
                           {article.title}
                         </h1>
-                        <p className="text-gray-200 mb-4 line-clamp-2 max-w-2xl">
+                        <p className="text-gray-200 mb-4 line-clamp-2 max-w-2xl text-sm md:text-base">
                           {article.summary}
                         </p>
-                        <div className="flex items-center text-gray-300 text-sm mb-2">
-                          <span>{formatDate(article.publishedAt)}</span>
-                          <span className="mx-2">•</span>
-                          <span>{article.authorName}</span>
+                        <div className="flex flex-wrap items-center text-gray-300 text-sm mb-3">
+                          <span className="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            {formatDate(article.publishedAt)}
+                          </span>
+                          <span className="mx-2 hidden sm:inline">•</span>
+                          <span className="flex items-center mt-1 sm:mt-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            {article.authorName}
+                          </span>
                         </div>
-                        <span className="inline-flex items-center text-white font-medium hover:text-green-400 transition-colors">
+                        <span className="inline-flex items-center text-white font-medium text-sm md:text-base group">
                           Lire l&apos;article
                           <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -298,19 +260,19 @@ export default function HomePage() {
               {/* Boutons de navigation */}
               <button 
                 onClick={goToPrevSlide}
-                className="absolute top-1/2 left-4 z-30 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 focus:outline-none transition-colors"
+                className="absolute top-1/2 left-4 z-30 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2.5 focus:outline-none transition-colors transform hover:scale-110 active:scale-95"
                 aria-label="Article précédent"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
               <button 
                 onClick={goToNextSlide}
-                className="absolute top-1/2 right-4 z-30 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 focus:outline-none transition-colors"
+                className="absolute top-1/2 right-4 z-30 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2.5 focus:outline-none transition-colors transform hover:scale-110 active:scale-95"
                 aria-label="Article suivant"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -321,8 +283,8 @@ export default function HomePage() {
                   <button
                     key={index}
                     onClick={() => goToSlide(index)}
-                    className={`h-2.5 w-2.5 rounded-full transition-all ${
-                      currentSlide === index ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/80'
+                    className={`h-2 rounded-full transition-all ${
+                      currentSlide === index ? 'bg-white w-8' : 'bg-white/40 w-2 hover:bg-white/70'
                     }`}
                     aria-label={`Aller à l'article ${index + 1}`}
                   />
@@ -330,22 +292,25 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Miniatures des autres articles en vedette (optionnel) */}
+            {/* Miniatures des autres articles en vedette */}
             {featuredArticles.length > 1 && (
-              <div className="mt-4 hidden md:grid md:grid-cols-5  gap-2">
+              <div className="mt-4 hidden md:grid grid-cols-5 gap-3">
                 {featuredArticles.slice(0, 5).map((article, index) => (
                   <button
                     key={article.id}
                     onClick={() => goToSlide(index)}
-                    className={`relative h-20 rounded-lg overflow-hidden transition-all ${
-                      currentSlide === index ? 'ring-2 ring-green-700 opacity-100' : 'opacity-70 hover:opacity-100'
+                    className={`relative h-20 rounded-lg overflow-hidden transition-all transform ${
+                      currentSlide === index 
+                        ? 'ring-2 ring-green-600 opacity-100 scale-105' 
+                        : 'opacity-70 hover:opacity-100 hover:scale-105'
                     }`}
                   >
                     <Image 
                       src={article.imageUrl || '/image.svg'} 
                       alt={article.title}
-                      layout="fill"
-                      objectFit="cover"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1200px) 20vw, 150px"
                     />
                   </button>
                 ))}
@@ -355,87 +320,23 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Articles les plus populaires en carrousel */}
+      {/* Articles les plus populaires avec le nouveau composant */}
       {popularArticles.length > 0 && (
-        <section className="bg-gray-50 py-10 mb-12">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold mb-8 flex items-center">
-              <span className="w-8 h-1 bg-red-600 mr-3"></span>
-              Articles les plus populaires
-            </h2>
-            
-            <div className="relative">
-              {/* Carrousel des articles populaires */}
-              <div 
-                ref={popularCarouselRef}
-                className="relative overflow-hidden rounded-lg"
-              >
-                <div 
-                  className="flex transition-transform duration-500 ease-out" 
-                  style={{ transform: `translateX(-${popularCurrentSlide * 100}%)` }}
-                >
-                  {/* Calculer le nombre de slides en fonction du nombre d'articles à afficher par slide */}
-                  {Array.from({ length: Math.ceil(popularArticles.length / 3) }).map((_, slideIndex) => (
-                    <div key={slideIndex} className="min-w-full">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {popularArticles.slice(slideIndex * 3, slideIndex * 3 + 3).map((article) => (
-                          <ArticleCard key={article.id} article={article} categories={categories} />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Boutons de navigation */}
-              {popularArticles.length > 3 && (
-                <>
-                  <button 
-                    onClick={goToPrevPopularSlide}
-                    className="absolute top-1/2 left-0 -translate-y-1/2 bg-white hover:bg-gray-100 text-gray-800 rounded-full p-2 shadow-md focus:outline-none transition-colors -ml-4 z-10"
-                    aria-label="Articles populaires précédents"
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                  <button 
-                    onClick={goToNextPopularSlide}
-                    className="absolute top-1/2 right-0 -translate-y-1/2 bg-white hover:bg-gray-100 text-gray-800 rounded-full p-2 shadow-md focus:outline-none transition-colors -mr-4 z-10"
-                    aria-label="Articles populaires suivants"
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                </>
-              )}
-
-              {/* Indicateurs de slide */}
-              {popularArticles.length > 3 && (
-                <div className="mt-6 flex justify-center space-x-2">
-                  {Array.from({ length: Math.ceil(popularArticles.length / 3) }).map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => goToPopularSlide(index)}
-                      className={`h-2.5 w-2.5 rounded-full transition-all ${
-                        popularCurrentSlide === index ? 'bg-green-700 w-8' : 'bg-gray-300 hover:bg-gray-400'
-                      }`}
-                      aria-label={`Aller aux articles populaires groupe ${index + 1}`}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
+        <section className="bg-gradient-to-b from-white to-gray-50 py-12 md:py-16">
+          <div className="max-w-7xl mx-auto px-4">
+            <PopularArticlesCarousel 
+              articles={popularArticles} 
+              categories={categories} 
+            />
           </div>
         </section>
       )}
 
-      {/* Dernières actualités - AVEC ArticleCard */}
-      <section className="container mx-auto px-4 mb-16">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-bold flex items-center">
-            <span className="w-8 h-1 bg-red-600 mr-3"></span>
+      {/* Dernières actualités */}
+      <section className="py-12 md:py-16 max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between mb-10">
+          <h2 className="text-2xl md:text-3xl font-bold flex items-center">
+            <span className="w-8 h-1.5 bg-red-600 rounded-full mr-3"></span>
             Dernières actualités
           </h2>
         </div>
@@ -446,9 +347,9 @@ export default function HomePage() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
               {latestArticles.map((article, index) => (
-                <div key={article.id} className={index === 0 ? 'md:col-span-2 lg:col-span-1' : ''}>
+                <div key={article.id} className={index === 0 ? 'sm:col-span-2 lg:col-span-1' : ''}>
                   <ArticleCard article={article} categories={categories} />
                 </div>
               ))}
@@ -459,7 +360,7 @@ export default function HomePage() {
                 <button 
                   onClick={loadMoreArticles}
                   disabled={loadingMore}
-                  className="px-8 py-3 bg-green-700 hover:bg-green-800 text-white font-medium rounded-xl transition-colors disabled:bg-gray-400 flex items-center shadow-md hover:shadow-lg"
+                  className="px-8 py-3.5 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium rounded-full transition-all disabled:from-gray-400 disabled:to-gray-500 flex items-center shadow-md hover:shadow-lg transform hover:translate-y-[-2px] active:translate-y-0"
                 >
                   {loadingMore ? (
                     <>
@@ -469,7 +370,7 @@ export default function HomePage() {
                   ) : (
                     <>
                       Voir plus d&apos;articles
-                      <svg className="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="ml-2 w-5 h-5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                       </svg>
                     </>
@@ -483,16 +384,16 @@ export default function HomePage() {
       
       {/* Tous les autres articles */}
       {otherArticles.length > 0 && (
-        <section className="bg-gray-100 py-10 mb-16">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold flex items-center">
-                <span className="w-8 h-1 bg-red-600 mr-3"></span>
+        <section className="bg-gradient-to-b from-gray-50 to-gray-100 py-12 md:py-16">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex items-center justify-between mb-10">
+              <h2 className="text-2xl md:text-3xl font-bold flex items-center">
+                <span className="w-8 h-1.5 bg-red-600 rounded-full mr-3"></span>
                 Autres actualités
               </h2>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
               {otherArticles.map((article) => (
                 <div key={article.id}>
                   <ArticleCard article={article} categories={categories} />
@@ -505,7 +406,7 @@ export default function HomePage() {
                 <button 
                   onClick={loadMoreOtherArticles}
                   disabled={loadingMore}
-                  className="px-8 py-3 bg-green-700 hover:bg-green-800 text-white font-medium rounded-xl transition-colors disabled:bg-gray-400 flex items-center shadow-md hover:shadow-lg"
+                  className="px-8 py-3.5 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium rounded-full transition-all disabled:from-gray-400 disabled:to-gray-500 flex items-center shadow-md hover:shadow-lg transform hover:translate-y-[-2px] active:translate-y-0"
                 >
                   {loadingMore ? (
                     <>
@@ -515,7 +416,7 @@ export default function HomePage() {
                   ) : (
                     <>
                       Voir plus d&apos;articles
-                      <svg className="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="ml-2 w-5 h-5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                       </svg>
                     </>

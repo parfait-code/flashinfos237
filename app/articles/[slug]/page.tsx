@@ -227,7 +227,7 @@ export default function ArticleDetailPage() {
       {/* Image principale avec overlay */}
       <div className="relative w-full h-[40vh] md:h-[60vh] mb-12 rounded-xl overflow-hidden shadow-xl">
         <Image 
-          src={article.imageUrl} 
+          src={article.imageUrl || "/image.svg"} 
           alt={article.title} 
           fill
           className="object-cover transition-transform hover:scale-105 duration-700"
@@ -350,9 +350,10 @@ export default function ArticleDetailPage() {
           </div> */}
           
           {/* Articles similaires */}
+
           <div className="sticky top-6">
             <h3 className="text-lg font-semibold mb-6 text-gray-800 pb-2 border-b">Articles similaires</h3>
-            <ArticleRelated articles={relatedArticles} />
+            <ArticleRelated articles={relatedArticles} category={categories[0].name} />
           </div>
         </div>
       </div>

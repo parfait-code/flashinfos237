@@ -8,9 +8,10 @@ import { formatDate } from '@/utils/helpers';
 
 interface ArticleRelatedProps {
   articles: Article[];
+  category: string;
 }
 
-const ArticleRelated: React.FC<ArticleRelatedProps> = ({ articles }) => {
+const ArticleRelated: React.FC<ArticleRelatedProps> = ({ articles, category }) => {
   return (
     <div className="space-y-6">
       {articles.length === 0 ? (
@@ -55,7 +56,7 @@ const ArticleRelated: React.FC<ArticleRelatedProps> = ({ articles }) => {
       )}
       
       <Link 
-        href="/articles"
+        href={`/categories/${category}`}
         className="flex items-center justify-center text-sm text-blue-600 hover:text-blue-800 transition mt-4 py-2 border-t border-gray-100"
       >
         Voir tous les articles <FiArrowRight className="ml-2" />
