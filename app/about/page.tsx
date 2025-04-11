@@ -34,7 +34,7 @@ export default function AboutPage() {
                 FlashInfos237 est né d&apos;un simple constat : le besoin d&apos;une source d&apos;information fiable, rapide et objective sur l&apos;actualité camerounaise. Dans un monde où la désinformation se propage à la vitesse de la lumière, notre équipe de journalistes chevronnés s&apos;est donnée pour mission de ramener l&apos;intégrité et la rigueur au cœur du paysage médiatique camerounais.
               </p>
               <p className="mb-4">
-                Lancé en 2022, notre portail d&apos;informations est rapidement devenu une référence pour les Camerounais du pays et de la diaspora, ainsi que pour tous ceux qui s&apos;intéressent à l&apos;actualité de ce pays d&apos;Afrique centrale. Notre croissance rapide témoigne de la confiance que nos lecteurs placent en nous et de la qualité de notre travail journalistique.
+                Lancé en 2025, notre portail d&apos;informations se projette comme une référence pour les Camerounais du pays et de la diaspora, ainsi que pour tous ceux qui s&apos;intéressent à l&apos;actualité de ce pays d&apos;Afrique centrale. Notre croissance rapide témoigne de la confiance que nos lecteurs placent en nous et de la qualité de notre travail journalistique.
               </p>
               <p>
                 Aujourd&apos;hui, FlashInfos237 continue d&apos;évoluer, en investissant dans les nouvelles technologies et en élargissant notre couverture, mais toujours avec le même engagement envers la vérité et l&apos;excellence journalistique qui ont fait notre réputation.
@@ -128,10 +128,10 @@ export default function AboutPage() {
           </h2>
           <div className="bg-white rounded-lg shadow-lg p-6 md:p-8">
             <p className="mb-4">
-              Notre équipe est composée de journalistes professionnels, d&apos;analystes et d&apos;experts dans divers domaines, tous unis par la passion de l&apos;information de qualité. Forts de leur expérience acquise dans les médias nationaux et internationaux, nos rédacteurs apportent une perspective unique et approfondie sur l&apos;actualité camerounaise.
+              Notre équipe est composée de journalistes professionnels, d&apos;analystes et d&apos;experts dans divers domaines, tous unis par la passion de l&apos;information de qualité. Forts de leur expérience acquise dans les médias nationaux et internationaux, nos rédacteurs apportent une perspective unique et approfondie sur l&apos;actualité camerounaise et internationale.
             </p>
             <p className="mb-4">
-              De la politique à l&apos;économie, en passant par le sport, la culture et les nouvelles technologies, nos spécialistes travaillent sans relâche pour vous offrir une couverture complète et nuancée de tout ce qui fait l&apos;actualité au Cameroun.
+              De la politique à l&apos;économie, en passant par le sport, la culture et les nouvelles technologies, nos spécialistes travaillent sans relâche pour vous offrir une couverture complète et nuancée de tout ce qui fait l&apos;actualité au Cameroun et a l'internationale.
             </p>
           </div>
         </section>

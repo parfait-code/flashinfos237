@@ -221,7 +221,7 @@ export default function HomePage() {
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
                       />
                       <span className="absolute inset-0 z-20 p-6 md:p-10 flex flex-col justify-end">
-                        <div className="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-1.5 rounded-full text-xs uppercase font-bold w-fit mb-4 tracking-wider shadow-md">
+                        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-1.5 rounded-full text-xs uppercase font-bold w-fit mb-4 tracking-wider shadow-md">
                           À la une
                         </div>
                         <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-3 line-clamp-3 leading-tight">
@@ -301,7 +301,7 @@ export default function HomePage() {
                     onClick={() => goToSlide(index)}
                     className={`relative h-20 rounded-lg overflow-hidden transition-all transform ${
                       currentSlide === index 
-                        ? 'ring-2 ring-green-600 opacity-100 scale-105' 
+                        ? 'ring-2 ring-blue-600 opacity-100 scale-105' 
                         : 'opacity-70 hover:opacity-100 hover:scale-105'
                     }`}
                   >
@@ -343,7 +343,7 @@ export default function HomePage() {
 
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-700"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-700"></div>
           </div>
         ) : (
           <>
@@ -360,7 +360,7 @@ export default function HomePage() {
                 <button 
                   onClick={loadMoreArticles}
                   disabled={loadingMore}
-                  className="px-8 py-3.5 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium rounded-full transition-all disabled:from-gray-400 disabled:to-gray-500 flex items-center shadow-md hover:shadow-lg transform hover:translate-y-[-2px] active:translate-y-0"
+                  className="px-8 py-3.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium rounded-full transition-all disabled:from-gray-400 disabled:to-gray-500 flex items-center shadow-md hover:shadow-lg transform hover:translate-y-[-2px] active:translate-y-0"
                 >
                   {loadingMore ? (
                     <>
@@ -406,7 +406,7 @@ export default function HomePage() {
                 <button 
                   onClick={loadMoreOtherArticles}
                   disabled={loadingMore}
-                  className="px-8 py-3.5 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium rounded-full transition-all disabled:from-gray-400 disabled:to-gray-500 flex items-center shadow-md hover:shadow-lg transform hover:translate-y-[-2px] active:translate-y-0"
+                  className="px-8 py-3.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium rounded-full transition-all disabled:from-gray-400 disabled:to-gray-500 flex items-center shadow-md hover:shadow-lg transform hover:translate-y-[-2px] active:translate-y-0"
                 >
                   {loadingMore ? (
                     <>
