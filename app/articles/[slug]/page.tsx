@@ -119,14 +119,14 @@ export default function ArticleDetailPage() {
         const viewedArticles = JSON.parse(localStorage.getItem('viewedArticles') || '{}');
         const hasBeenViewed = viewedArticles[foundArticle.id];
         
-        if (!hasBeenViewed) {
+        // if (!hasBeenViewed) {
           // Incrémenter le compteur de vues seulement si pas encore vu
           await articleService.incrementViewCount(foundArticle.id);
           
           // Marquer l'article comme vu
           viewedArticles[foundArticle.id] = true;
           localStorage.setItem('viewedArticles', JSON.stringify(viewedArticles));
-        }
+        // }
         
         // Reste du code inchangé...
       } catch (err) {
@@ -142,6 +142,13 @@ export default function ArticleDetailPage() {
     }
   }, [slug]);
 
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }, [slug]);
+  
   if (error) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -323,7 +330,7 @@ export default function ArticleDetailPage() {
             
             <CommentsList comments={comments} />
             
-            <div className="mt-10 bg-gray-50 rounded-xl p-8 border border-gray-200">
+            <div className="mt-10 bg-gray-50 rounded-xl p-4 md:p-8 border border-gray-200">
               <h3 className="text-xl font-semibold mb-6 text-gray-800">Laisser un commentaire</h3>
               <CommentForm articleId={article.id} />
             </div>

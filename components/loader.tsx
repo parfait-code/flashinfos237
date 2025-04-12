@@ -4,6 +4,13 @@ import { useEffect, useState } from 'react';
 // À intégrer dans votre composant
 export default function Loader () {
   const [progress, setProgress] = useState(0);
+ 
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }, []);
   
   useEffect(() => {
     const timer = setInterval(() => {
@@ -20,9 +27,10 @@ export default function Loader () {
       clearInterval(timer);
     };
   }, []);
+
   
   return (
-    <div className="flex flex-col justify-center items-center h-[60vh] gap-6 w-full max-w-md mx-auto">
+    <div className="px-4 flex flex-col justify-center items-center h-[60vh] gap-6 w-full max-w-md mx-auto">
       {/* Texte coloré avec effet de gradient */}
       <div className="font-bold text-3xl flex items-center">
         <span className="text-green-600">Flash</span>
