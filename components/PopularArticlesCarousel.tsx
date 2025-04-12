@@ -174,7 +174,7 @@ export default function PopularArticlesCarousel({ articles, categories }: Popula
               onClick={() => goToSlide(index)}
               className={`h-2.5 transition-all duration-300 rounded-full ${
                 currentSlide === index 
-                  ? 'bg-green-600 w-8' 
+                  ? 'bg-blue-600 w-8' 
                   : 'bg-gray-300 w-2.5 hover:bg-gray-400'
               }`}
               aria-label={`Aller aux articles populaires groupe ${index + 1}`}
