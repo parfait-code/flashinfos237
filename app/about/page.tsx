@@ -11,7 +11,7 @@ export default function AboutPage() {
   return (
     <main className="bg-gray-50">
       {/* En-tête de la page - Style inspiré de la page Contact */}
-      <div className="z-10 bg-gradient-to-r from-green-700 via-red-600 to-amber-500">
+      <div className="z-0 bg-gradient-to-r from-green-700 via-red-600 to-amber-500">
         <div className="container bg-transparent mx-auto px-4 py-12 md:py-16 text-center text-white">
           <h1 className="text-3xl md:text-5xl font-bold mb-4">À propos de <span>Flash<span>Infos</span>237</span></h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto">
