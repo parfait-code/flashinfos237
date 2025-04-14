@@ -66,7 +66,7 @@ export default function Footer() {
     setSubmitting(true);
     
     try {
-      await newsletterService.subscribeToNewsletter({ email });
+      await newsletterService.subscribeToNewsletter({ email: string });
       toast.success('Merci pour votre abonnement à notre newsletter!');
       setSubmitStatus({
         type: 'success',
