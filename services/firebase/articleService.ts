@@ -209,5 +209,25 @@ export const articleService = {
       console.error('Error incrementing view count:', error);
       throw error;
     }
+  },
+  
+  // Incrémenter le compteur de likes d'un article
+  async incrementLikeCount(id: string): Promise<void> {
+    try {
+      const docRef = doc(db, COLLECTION_NAME, id);
+      const articleDoc = await getDoc(docRef);
+      
+      if (articleDoc.exists()) {
+        const currentLikeCount = articleDoc.data().likeCount || 0;
+        await updateDoc(docRef, {
+          likeCount: currentLikeCount + 1,
+          updatedAt: new Date()
+        });
+      }
+    } catch (error) {
+      console.error('Error incrementing like count:', error);
+      throw error;
+    }
   }
+
 };

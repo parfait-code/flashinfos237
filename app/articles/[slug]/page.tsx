@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import './articleContent.css'
-import { FiCalendar, FiUser, FiEye, FiMessageSquare, FiHeart, FiShare2, FiArrowLeft } from 'react-icons/fi';
+import { FiCalendar, FiUser, FiEye, FiMessageSquare, FiArrowLeft, FiThumbsUp } from 'react-icons/fi';
 import { articleService } from '@/services/firebase/articleService';
 import { CommentService } from '@/services/firebase/commentService';
 import { categoryService } from '@/services/firebase/categoryService';
@@ -19,6 +19,8 @@ import ShareButtons from '@/components/article/ShareButtons';
 import CommentForm from '@/components/comment/CommentForm';
 import ArticleRelated from '@/components/article/ArticleRelated';
 import Loader from '@/components/loader';
+import { pageViewService } from '@/services/firebase/pageViewService';
+
 
 export default function ArticleDetailPage() {
   const params = useParams();
@@ -31,6 +33,8 @@ export default function ArticleDetailPage() {
   const [comments, setComments] = useState<CommentType[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
+  const [hasLiked, setHasLiked] = useState<boolean>(false);
+
 
   useEffect(() => {
     async function fetchArticleData() {
@@ -119,19 +123,49 @@ export default function ArticleDetailPage() {
         const viewedArticles = JSON.parse(localStorage.getItem('viewedArticles') || '{}');
         const hasBeenViewed = viewedArticles[foundArticle.id];
         
-        // if (!hasBeenViewed) {
+        if (!hasBeenViewed) {
           // Incrémenter le compteur de vues seulement si pas encore vu
           await articleService.incrementViewCount(foundArticle.id);
+          
+          // Enregistrer la vue dans la collection pageViews
+          await pageViewService.recordPageView(foundArticle.id);
           
           // Marquer l'article comme vu
           viewedArticles[foundArticle.id] = true;
           localStorage.setItem('viewedArticles', JSON.stringify(viewedArticles));
-        // }
+        }
         
-        // Reste du code inchangé...
+        // Récupérer les commentaires approuvés pour cet article
+        const allComments = await CommentService.getCommentsByArticleId(foundArticle.id);
+        const approvedComments = allComments.filter(
+          comment => comment.status === CommentStatus.APPROVED
+        );
+        setComments(approvedComments);
+        
+        // Récupérer les catégories de l'article
+        const articleCategories = await Promise.all(
+          foundArticle.categoryIds.map(async (id) => {
+            const category = await categoryService.getCategoryById(id);
+            return category;
+          })
+        );
+        setCategories(articleCategories.filter((category): category is Category => category !== null));
+        
+        // Récupérer les articles similaires (même catégorie)
+        if (foundArticle.categoryIds.length > 0) {
+          const { articles: related } = await articleService.getArticles({
+            status: ArticleStatus.PUBLISHED,
+            categoryId: foundArticle.categoryIds[0],
+            limit: 3
+          });
+          
+          // Filtrer pour exclure l'article courant
+          const filteredRelated = related.filter(a => a.id !== foundArticle.id);
+          setRelatedArticles(filteredRelated);
+        }
       } catch (err) {
-        console.log(err)
-        // ...gestion d'erreur inchangée
+        console.error('Error fetching article data:', err);
+        setError('Une erreur est survenue lors du chargement des données');
       } finally {
         setLoading(false);
       }
@@ -149,6 +183,37 @@ export default function ArticleDetailPage() {
     });
   }, [slug]);
   
+    const handleLikeClick = async () => {
+    if (hasLiked || !article) return; // Éviter les likes multiples
+    
+    try {
+      await articleService.incrementLikeCount(article.id);
+      
+      // Mettre à jour l'état local pour refléter le like
+      setArticle({
+        ...article,
+        likeCount: article.likeCount + 1
+      });
+      
+      // Marquer l'article comme aimé dans le localStorage pour éviter les likes multiples
+      const likedArticles = JSON.parse(localStorage.getItem('likedArticles') || '{}');
+      likedArticles[article.id] = true;
+      localStorage.setItem('likedArticles', JSON.stringify(likedArticles));
+      
+      setHasLiked(true);
+    } catch (err) {
+      console.error('Erreur lors de l\'ajout du like:', err);
+    }
+  };
+
+  // Vérifier si l'article a déjà été aimé lors du chargement
+  useEffect(() => {
+    if (article) {
+      const likedArticles = JSON.parse(localStorage.getItem('likedArticles') || '{}');
+      setHasLiked(!!likedArticles[article.id]);
+    }
+  }, [article]);
+
   if (error) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -253,9 +318,9 @@ export default function ArticleDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
         <div className="lg:col-span-3">
           {/* Résumé */}
-          <div className="font-medium text-xl text-gray-700 mb-8 italic border-l-4 border-blue-500 pl-6 py-2">
+          {/* <div className="font-medium text-xl text-gray-700 mb-8 italic border-l-4 border-blue-500 pl-6 py-2">
             {article.summary}
-          </div>
+          </div> */}
           
           {/* Contenu principal */}
           <div 
@@ -305,14 +370,17 @@ export default function ArticleDetailPage() {
           {/* Boutons de partage */}
           <div className="flex items-center justify-between border-t border-b border-gray-200 py-6 mb-12">
             <div className="flex items-center gap-6">
-              <button className="flex items-center gap-2 text-gray-600 hover:text-red-500 transition group">
-                <FiHeart className="group-hover:scale-110 transition" />
-                <span>{article.likeCount}</span>
-              </button>
-              <button className="flex items-center gap-2 text-gray-600 hover:text-blue-500 transition group">
+            <button 
+              onClick={handleLikeClick}
+              className={`flex items-center gap-2 transition group ${hasLiked ? 'text-blue-500' : 'text-gray-600 hover:text-blue-500'}`} disabled={hasLiked}
+            >
+              <FiThumbsUp className={`${hasLiked ? 'fill-current' : ''} group-hover:scale-110 transition`} />
+              <span>{article.likeCount}</span>
+            </button>
+              {/* <button className="flex items-center gap-2 text-gray-600 hover:text-blue-500 transition group">
                 <FiShare2 className="group-hover:scale-110 transition" />
                 <span>{article.shareCount}</span>
-              </button>
+              </button> */}
             </div>
             
             <ShareButtons 
