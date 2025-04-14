@@ -1,5 +1,5 @@
 // components/PopularArticlesCarousel.tsx
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Article } from '@/types/article';
 import { Category } from '@/types/category';
 import ArticleCard from '@/components/ArticleCard';
@@ -18,19 +18,31 @@ export default function PopularArticlesCarousel({ articles, categories }: Popula
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
   const [totalSlides, setTotalSlides] = useState(Math.ceil(articles.length / itemsPerSlide));
 
-  const goToPrevSlide = () => {
-    // Calculer l'index précédent en tenant compte du nombre d'articles à faire défiler
-    const newIndex = Math.max(0, currentSlide - 1);
-    setCurrentSlide(newIndex);
-    resetAutoPlay();
-  };
-
-  const goToNextSlide = () => {
-    // Calculer l'index suivant en tenant compte du nombre d'articles à faire défiler
+  // D'abord définir goToNextSlide sans resetAutoPlay
+  const goToNextSlide = useCallback(() => {
+    // Calculer l'index suivant
     const newIndex = (currentSlide + 1) % totalSlides;
     setCurrentSlide(newIndex);
-    resetAutoPlay();
-  };
+    // Ne pas appeler resetAutoPlay() ici
+  }, [currentSlide, totalSlides]);
+  
+  // Ensuite définir goToPrevSlide sans resetAutoPlay
+  const goToPrevSlide = useCallback(() => {
+    // Calculer l'index précédent
+    const newIndex = Math.max(0, currentSlide - 1);
+    setCurrentSlide(newIndex);
+    // Ne pas appeler resetAutoPlay() ici
+  }, [currentSlide]);
+  
+  // Enfin définir resetAutoPlay qui utilise goToNextSlide
+  const resetAutoPlay = useCallback(() => {
+    if (autoPlayRef.current) {
+      clearInterval(autoPlayRef.current);
+      autoPlayRef.current = setInterval(() => {
+        goToNextSlide();
+      }, 7000);
+    }
+  }, [goToNextSlide]);
 
   // Gestion du responsive
   useEffect(() => {
@@ -90,24 +102,22 @@ export default function PopularArticlesCarousel({ articles, categories }: Popula
         }
       };
     }
-  }, [articles.length, totalSlides, slidesToScroll]);
+  }, [articles.length, totalSlides, slidesToScroll, goToNextSlide]);
 
   // Fonctions pour le contrôle du carrousel
-  const goToSlide = (index: number) => {
+  const goToSlide = useCallback((index: number) => {
     setCurrentSlide(index);
     resetAutoPlay();
-  };
+  }, [resetAutoPlay]);
 
  
-  // Réinitialiser l'autoplay
-  const resetAutoPlay = () => {
-    if (autoPlayRef.current) {
-      clearInterval(autoPlayRef.current);
-      autoPlayRef.current = setInterval(() => {
-        goToNextSlide();
-      }, 7000);
-    }
-  };
+
+
+
+// Utiliser un useEffect pour réinitialiser l'autoplay lorsque currentSlide change
+useEffect(() => {
+  resetAutoPlay();
+}, [currentSlide, resetAutoPlay]);
 
   if (articles.length === 0) return null;
 
