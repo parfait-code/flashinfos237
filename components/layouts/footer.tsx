@@ -74,19 +74,30 @@ export default function Footer() {
         message: 'Merci pour votre abonnement à notre newsletter!'
       });
       setEmail(''); // Réinitialiser le champ après soumission réussie
-    } catch (error: any) {
+    }catch (error: unknown) {
       console.error('Erreur lors de l\'abonnement:', error);
-      if (error.message === 'Cette adresse email est déjà abonnée à la newsletter.') {
-        toast.error(error.message);
-        setSubmitStatus({
-          type: 'error',
-          message: error.message
-        });
+      
+      // Vous pouvez ensuite vérifier le type d'erreur de manière sécurisée
+      if (error instanceof Error) {
+        if (error.message === 'Cette adresse email est déjà abonnée à la newsletter.') {
+          toast.error(error.message);
+          setSubmitStatus({
+            type: 'error',
+            message: error.message
+          });
+        } else {
+          toast.error('Une erreur est survenue. Veuillez réessayer plus tard.');
+          setSubmitStatus({
+            type: 'error',
+            message: 'Une erreur est survenue. Veuillez réessayer plus tard.'
+          });
+        }
       } else {
-        toast.error('Une erreur est survenue. Veuillez réessayer plus tard.');
+        // Si ce n'est pas une Error standard
+        toast.error('Une erreur inconnue est survenue.');
         setSubmitStatus({
           type: 'error',
-          message: 'Une erreur est survenue. Veuillez réessayer plus tard.'
+          message: 'Une erreur inconnue est survenue.'
         });
       }
     } finally {
