@@ -1,59 +1,95 @@
-'use client'
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 
-// À intégrer dans votre composant
-export default function Loader () {
-  const [progress, setProgress] = useState(0);
- 
-  useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  }, []);
+export default function FlashLoader() {
+  const [rotation, setRotation] = useState(0);
+  const [scale, setScale] = useState(1);
   
   useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((oldProgress) => {
-        const newProgress = Math.min(oldProgress + Math.random() * 10, 100);
-        if (newProgress === 100) {
-          clearInterval(timer);
-        }
-        return newProgress;
-      });
-    }, 200);
+    // Animation de rotation continue par tours de 360°
+    const spinInterval = setInterval(() => {
+      // Réinitialise à 0 après chaque tour complet pour éviter des valeurs trop grandes
+      setRotation(prev =>  prev + 6);
+    }, 50);
+    
+    // Animation de pulsation
+    const pulseInterval = setInterval(() => {
+      setScale(prev => prev === 1 ? 1.1 : 1);
+    }, 700);
     
     return () => {
-      clearInterval(timer);
+      clearInterval(spinInterval);
+      clearInterval(pulseInterval);
     };
   }, []);
-
   
   return (
-    <div className="px-4 flex flex-col justify-center items-center h-[60vh] gap-6 w-full max-w-md mx-auto">
-      {/* Texte coloré avec effet de gradient */}
-      <div className="font-bold text-3xl flex items-center">
-        <span className="text-green-600">Flash</span>
-        <span className="text-red-600">Infos</span>
-        <span className="text-yellow-500">237</span>
+    <div className="flex flex-col items-center justify-center w-full h-64">
+      <div 
+        style={{ 
+          transform: `rotate(${rotation}deg) scale(${scale})`,
+          width: '80px',
+          height: '80px',
+          transformOrigin: 'center center',
+          transition: 'transform 0.1s linear'
+        }}
+      >
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          {/* Définition du gradient avec plus d'espace pour le vert */}
+          <defs>
+            <linearGradient id="adjustedGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#047857" />
+              <stop offset="40%" stopColor="#047857" />
+              <stop offset="60%" stopColor="#dc2626" />
+              <stop offset="80%" stopColor="#f59e0b" />
+            </linearGradient>
+          </defs>
+          
+          {/* Cercle avec le gradient ajusté */}
+          <circle cx="16" cy="16" r="16" fill="url(#adjustedGradient)" />
+          
+          {/* Symbole éclair (flash) en blanc */}
+          <path d="M18 4 L10 16 L15 16 L14 28 L22 16 L17 16 Z" fill="white" stroke="white" strokeWidth="0.5" />
+        </svg>
       </div>
       
-      {/* Barre de progression */}
-      <div className="w-full bg-gray-200 rounded-full h-2.5">
-        <div 
-          className="h-2.5 rounded-full transition-all duration-300 ease-out"
-          style={{ 
-            width: `${progress}%`,
-            background: 'linear-gradient(to right, #16a34a, #dc2626, #eab308)'
-          }}
-        ></div>
+      <p className="mt-4 text-lg font-semibold text-gray-700">Chargement en cours...</p>
+      
+      {/* Points de chargement animés avec les couleurs thématiques */}
+      <div className="flex mt-2">
+        <LoadingDot delay={0} color="#047857" /> {/* Point vert */}
+        <LoadingDot delay={300} color="#dc2626" /> {/* Point rouge */}
+        <LoadingDot delay={600} color="#f59e0b" /> {/* Point jaune/orange */}
       </div>
-      
-      {/* Spinner */}
-      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-700"></div>
-      
-      {/* Texte de chargement */}
-      <p className="text-gray-600">Chargement en cours...</p>
     </div>
   );
-};
+}
+
+// Composant pour les points de chargement colorés
+function LoadingDot({ delay, color }: { delay: number; color: string }) {
+  const [visible, setVisible] = useState(false);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVisible(prev => !prev);
+    }, 600);
+    
+    // Décalage initial pour une animation en séquence
+    const timeout = setTimeout(() => {
+      setVisible(true);
+    }, delay);
+    
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [delay]);
+  
+  return (
+    <div 
+      className={`h-3 w-3 mx-1 rounded-full transition-all duration-300 ${
+        visible ? 'opacity-100' : 'opacity-30'
+      }`}
+      style={{ backgroundColor: color }}
+    />
+  );
+}
