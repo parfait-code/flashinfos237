@@ -10,9 +10,9 @@ import { toast } from 'react-hot-toast'; // Supposant que vous utilisez react-ho
 
 export default function Footer() {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [email, setEmail] = useState('');
-  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [email, setEmail] = useState<string>('');
+  const [submitting, setSubmitting] = useState<boolean>(false);
   const [submitStatus, setSubmitStatus] = useState<{
     type: 'success' | 'error' | null;
     message: string;
@@ -66,7 +66,7 @@ export default function Footer() {
     setSubmitting(true);
     
     try {
-      await newsletterService.subscribeToNewsletter({ email: string });
+      await newsletterService.subscribeToNewsletter({ email });
       toast.success('Merci pour votre abonnement à notre newsletter!');
       setSubmitStatus({
         type: 'success',

@@ -18,6 +18,20 @@ export default function PopularArticlesCarousel({ articles, categories }: Popula
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
   const [totalSlides, setTotalSlides] = useState(Math.ceil(articles.length / itemsPerSlide));
 
+  const goToPrevSlide = () => {
+    // Calculer l'index précédent en tenant compte du nombre d'articles à faire défiler
+    const newIndex = Math.max(0, currentSlide - 1);
+    setCurrentSlide(newIndex);
+    resetAutoPlay();
+  };
+
+  const goToNextSlide = () => {
+    // Calculer l'index suivant en tenant compte du nombre d'articles à faire défiler
+    const newIndex = (currentSlide + 1) % totalSlides;
+    setCurrentSlide(newIndex);
+    resetAutoPlay();
+  };
+
   // Gestion du responsive
   useEffect(() => {
     const handleResize = () => {
@@ -76,7 +90,7 @@ export default function PopularArticlesCarousel({ articles, categories }: Popula
         }
       };
     }
-  }, [articles.length, totalSlides, slidesToScroll]);
+  }, [articles.length, totalSlides, slidesToScroll, goToNextSlide]);
 
   // Fonctions pour le contrôle du carrousel
   const goToSlide = (index: number) => {
@@ -84,20 +98,7 @@ export default function PopularArticlesCarousel({ articles, categories }: Popula
     resetAutoPlay();
   };
 
-  const goToPrevSlide = () => {
-    // Calculer l'index précédent en tenant compte du nombre d'articles à faire défiler
-    const newIndex = Math.max(0, currentSlide - 1);
-    setCurrentSlide(newIndex);
-    resetAutoPlay();
-  };
-
-  const goToNextSlide = () => {
-    // Calculer l'index suivant en tenant compte du nombre d'articles à faire défiler
-    const newIndex = (currentSlide + 1) % totalSlides;
-    setCurrentSlide(newIndex);
-    resetAutoPlay();
-  };
-
+ 
   // Réinitialiser l'autoplay
   const resetAutoPlay = () => {
     if (autoPlayRef.current) {
