@@ -1,18 +1,7 @@
 // services/firebase/newsletterService.ts
 import { collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc, query, where, orderBy } from 'firebase/firestore';
 import { db } from '@/config/firebase';
-
-export interface NewsletterSubscriber {
-  id: string;
-  email: string;
-  active: boolean;
-  createdAt: Date;
-  updatedAt?: Date;
-}
-
-export interface NewsletterSubscriptionData {
-  email: string;
-}
+import { NewsletterSubscriber, NewsletterSubscriptionData } from '@/types/newsletter';
 
 const COLLECTION_NAME = 'newsletter_subscribers';
 

@@ -90,7 +90,7 @@ export default function PopularArticlesCarousel({ articles, categories }: Popula
         }
       };
     }
-  }, [articles.length, totalSlides, slidesToScroll, goToNextSlide]);
+  }, [articles.length, totalSlides, slidesToScroll]);
 
   // Fonctions pour le contrôle du carrousel
   const goToSlide = (index: number) => {

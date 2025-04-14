@@ -8,6 +8,7 @@ import { Category } from '@/types/category';
 import { FiSend, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 import { toast } from 'react-hot-toast'; // Supposant que vous utilisez react-hot-toast pour les notifications
 
+
 export default function Footer() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
