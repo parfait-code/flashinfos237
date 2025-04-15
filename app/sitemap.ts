@@ -8,19 +8,19 @@ import { ArticleStatus } from '@/types/article'
 type ChangeFrequency = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never'
 
 // Helper function to ensure valid dates
-function ensureValidDate(dateInput: any): Date {
-  if (!dateInput) return new Date();
-  
-  try {
-    const date = new Date(dateInput);
-    // Check if date is valid
-    if (isNaN(date.getTime())) {
-      return new Date(); // Return current date if invalid
+function ensureValidDate(dateInput: string | number | Date): Date {
+    if (!dateInput) return new Date();
+    
+    try {
+        const date = new Date(dateInput);
+        // Check if date is valid
+        if (isNaN(date.getTime())) {
+            return new Date(); // Return current date if invalid
+        }
+        return date;
+    } catch (error) {
+        return new Date(); // Return current date on any error
     }
-    return date;
-  } catch (error) {
-    return new Date(); // Return current date on any error
-  }
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
