@@ -376,3 +376,36 @@ export default function ArticleDetailPage() {
     </>
   );
 }
+
+// Composant pour ajouter JSON-LD aux articles
+export function ArticleJsonLd({ article, category }: { article: Article; category: Category }) {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "NewsArticle",
+          "headline": article.title,
+          "image": [article.imageUrl],
+          "datePublished": article.publishedAt,
+          "dateModified": article.updatedAt || article.publishedAt,
+          "author": {
+            "@type": "Person",
+            "name": article.authorName
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "FlashInfos237",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://flashinfos237.com/logo.svg"
+            }
+          },
+          "description": article.summary,
+          "articleSection": category.name
+        })
+      }}
+    />
+  );
+}
