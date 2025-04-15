@@ -27,11 +27,6 @@ export const metadata: Metadata = {
       'fr': "https://flashinfos237.com",
     },
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-  },
   openGraph: {
     title: "FlashInfos237 | L'actualité camerounaise en temps réel",
     description: "Découvrez les dernières actualités du Cameroun et du monde entier. Informations fiables, analyses approfondies et couverture complète des événements majeurs.",
@@ -78,6 +73,11 @@ export const metadata: Metadata = {
     "revisit-after": "7 days",
   },
 };
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+}
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
