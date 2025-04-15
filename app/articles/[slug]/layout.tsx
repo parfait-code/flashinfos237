@@ -1,27 +1,29 @@
 // app/articles/[slug]/layout.tsx
-import { Metadata} from 'next';
+import { Metadata } from 'next';
 import { articleService } from '@/services/firebase/articleService';
 import { ArticleStatus } from '@/types/article';
 
+// Mise à jour du type Props pour refléter que params est une Promise
 type Props = {
-    params: Promise<{ slug: string }>
-    children: React.ReactNode
-  }
+  params: Promise<{ slug: string }>
+  children: React.ReactNode
+}
 
-  export async function generateMetadata(
-    { params }: Props
-  ): Promise<Metadata> {
-    try {
-      // Attendre la résolution de params avant d'utiliser ses propriétés
-      const slug = (await params).slug;
-      
-      // Le reste de votre code reste le même
-      const { articles } = await articleService.getArticles({
-        status: ArticleStatus.PUBLISHED,
-        limit: 100
-      });
-      
-      const article = articles.find(article => article.slug === slug);
+export async function generateMetadata(
+  { params }: Props
+): Promise<Metadata> {
+  try {
+    // Attendre la résolution de params avant d'utiliser ses propriétés
+    const resolvedParams = await params;
+    const slug = resolvedParams.slug;
+    
+    // Récupérer tous les articles pour trouver celui avec le slug correspondant
+    const { articles } = await articleService.getArticles({
+      status: ArticleStatus.PUBLISHED,
+      limit: 100
+    });
+    
+    const article = articles.find(article => article.slug === slug);
     
     // Si l'article n'est pas trouvé, retourner des métadonnées par défaut
     if (!article) {
@@ -70,6 +72,7 @@ type Props = {
   }
 }
 
-export default function ArticleLayout({ children }: Props) {
+// Mise à jour également du type dans la définition du layout
+export default function ArticleLayout({ children }: { children: React.ReactNode }) {
   return children;
 }
