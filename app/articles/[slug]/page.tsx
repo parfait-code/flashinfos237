@@ -1,6 +1,7 @@
 // app/articles/[slug]/page.tsx
 'use client';
 
+import { ArticleJsonLd } from 'next-seo';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -20,7 +21,6 @@ import CommentForm from '@/components/comment/CommentForm';
 import ArticleRelated from '@/components/article/ArticleRelated';
 import Loader from '@/components/loader';
 import { pageViewService } from '@/services/firebase/pageViewService';
-import Script from 'next/script';
 
 
 export default function ArticleDetailPage() {
@@ -177,39 +177,20 @@ export default function ArticleDetailPage() {
     return <Loader />;
   }
 
-  // Créer l'objet JSON-LD
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": article.title,
-    "description": article.summary || '',
-    "image": article.imageUrl || '',
-    "datePublished": article.publishedAt ? new Date(article.publishedAt).toISOString() : undefined,
-    "author": {
-      "@type": "Person",
-      "name": article.authorName || ''
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "flashinfos237",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://flashinfos237.com/logo.png"
-      }
-    },
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": `https://flashinfos237.com/articles/${article.slug}`
-    }
-  };
 
   return (
     <>
-    <Script
-        id="article-jsonld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+    {article && (
+        <ArticleJsonLd
+          url={`https://flashinfos237.com/articles/${article.slug}`}
+          title={article.title}
+          images={article.imageUrl ? [article.imageUrl] : []}
+          datePublished={article.publishedAt ? new Date(article.publishedAt).toISOString() : ''}
+          authorName={article.authorName || ''}
+          description={article.summary || ''}
+          publisherName="flashinfos237"
+          publisherLogo="https://flashinfos237.com/logo.svg"
+        />)}
     <div className=" mx-auto px-4 py-10 container">
       {/* Bouton de retour */}
       <div className="mb-8">
