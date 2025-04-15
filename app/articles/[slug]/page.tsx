@@ -20,6 +20,7 @@ import CommentForm from '@/components/comment/CommentForm';
 import ArticleRelated from '@/components/article/ArticleRelated';
 import Loader from '@/components/loader';
 import { pageViewService } from '@/services/firebase/pageViewService';
+import Script from 'next/script';
 
 
 export default function ArticleDetailPage() {
@@ -176,8 +177,39 @@ export default function ArticleDetailPage() {
     return <Loader />;
   }
 
+  // Créer l'objet JSON-LD
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": article.title,
+    "description": article.summary || '',
+    "image": article.imageUrl || '',
+    "datePublished": article.publishedAt ? new Date(article.publishedAt).toISOString() : undefined,
+    "author": {
+      "@type": "Person",
+      "name": article.authorName || ''
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "flashinfos237",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://flashinfos237.com/logo.png"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://flashinfos237.com/articles/${article.slug}`
+    }
+  };
+
   return (
     <>
+    <Script
+        id="article-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
     <div className=" mx-auto px-4 py-10 container">
       {/* Bouton de retour */}
       <div className="mb-8">
@@ -374,38 +406,5 @@ export default function ArticleDetailPage() {
       </div>
     </div>
     </>
-  );
-}
-
-// Composant pour ajouter JSON-LD aux articles
-export function ArticleJsonLd({ article, category }: { article: Article; category: Category }) {
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "NewsArticle",
-          "headline": article.title,
-          "image": [article.imageUrl],
-          "datePublished": article.publishedAt,
-          "dateModified": article.updatedAt || article.publishedAt,
-          "author": {
-            "@type": "Person",
-            "name": article.authorName
-          },
-          "publisher": {
-            "@type": "Organization",
-            "name": "FlashInfos237",
-            "logo": {
-              "@type": "ImageObject",
-              "url": "https://flashinfos237.com/logo.svg"
-            }
-          },
-          "description": article.summary,
-          "articleSection": category.name
-        })
-      }}
-    />
   );
 }
