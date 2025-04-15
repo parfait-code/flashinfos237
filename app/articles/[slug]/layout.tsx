@@ -4,26 +4,24 @@ import { articleService } from '@/services/firebase/articleService';
 import { ArticleStatus } from '@/types/article';
 
 type Props = {
-  params: { slug: string }
-  children: React.ReactNode
-}
+    params: Promise<{ slug: string }>
+    children: React.ReactNode
+  }
 
-export async function generateMetadata(
-  { params }: Props,
-//   parent: ResolvingMetadata
-): Promise<Metadata> {
-  try {
-    // Attendre explicitement que params soit résolu
-    const resolvedParams = await Promise.resolve(params);
-    const slug = resolvedParams.slug;
-    
-    // Récupérer tous les articles pour trouver celui avec le slug correspondant
-    const { articles } = await articleService.getArticles({
-      status: ArticleStatus.PUBLISHED,
-      limit: 100
-    });
-    
-    const article = articles.find(article => article.slug === slug);
+  export async function generateMetadata(
+    { params }: Props
+  ): Promise<Metadata> {
+    try {
+      // Attendre la résolution de params avant d'utiliser ses propriétés
+      const slug = (await params).slug;
+      
+      // Le reste de votre code reste le même
+      const { articles } = await articleService.getArticles({
+        status: ArticleStatus.PUBLISHED,
+        limit: 100
+      });
+      
+      const article = articles.find(article => article.slug === slug);
     
     // Si l'article n'est pas trouvé, retourner des métadonnées par défaut
     if (!article) {
