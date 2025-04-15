@@ -1,5 +1,5 @@
 // app/articles/[slug]/layout.tsx
-import { Metadata, ResolvingMetadata } from 'next';
+import { Metadata} from 'next';
 import { articleService } from '@/services/firebase/articleService';
 import { ArticleStatus } from '@/types/article';
 
