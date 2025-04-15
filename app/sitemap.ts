@@ -19,6 +19,7 @@ function ensureValidDate(dateInput: string | number | Date): Date {
         }
         return date;
     } catch (error) {
+        console.log(error)
         return new Date(); // Return current date on any error
     }
 }
