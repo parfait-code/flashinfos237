@@ -35,7 +35,6 @@ export default function ArticleDetailPage() {
   const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
   const [hasLiked, setHasLiked] = useState<boolean>(false);
 
-
   useEffect(() => {
     async function fetchArticleData() {
       try {
@@ -56,74 +55,14 @@ export default function ArticleDetailPage() {
         }
         
         setArticle(foundArticle);
-        
-        // Récupérer les commentaires approuvés pour cet article
-        const allComments = await CommentService.getCommentsByArticleId(foundArticle.id);
-        const approvedComments = allComments.filter(
-          comment => comment.status === CommentStatus.APPROVED
-        );
-        setComments(approvedComments);
-        
-        // Récupérer les catégories de l'article
-        const articleCategories = await Promise.all(
-          foundArticle.categoryIds.map(async (id) => {
-            const category = await categoryService.getCategoryById(id);
-            return category;
-          })
-        );
-        setCategories(articleCategories.filter((category): category is Category => category !== null));
-        
-        // Récupérer les articles similaires (même catégorie)
-        if (foundArticle.categoryIds.length > 0) {
-          const { articles: related } = await articleService.getArticles({
-            status: ArticleStatus.PUBLISHED,
-            categoryId: foundArticle.categoryIds[0],
-            limit: 3
-          });
-          
-          // Filtrer pour exclure l'article courant
-          const filteredRelated = related.filter(a => a.id !== foundArticle.id);
-          setRelatedArticles(filteredRelated);
-        }
-      } catch (err) {
-        console.error('Error fetching article data:', err);
-        setError('Une erreur est survenue lors du chargement des données');
-      } finally {
-        setLoading(false);
-      }
-    }
-    
-    if (slug) {
-      fetchArticleData();
-    }
-  }, [slug]);
 
-  useEffect(() => {
-    async function fetchArticleData() {
-      try {
-        setLoading(true);
-        
-        // Récupérer tous les articles pour trouver celui avec le slug correspondant
-        const { articles } = await articleService.getArticles({
-          status: ArticleStatus.PUBLISHED,
-          limit: 100
-        });
-        
-        const foundArticle = articles.find(article => article.slug === slug);
-        
-        if (!foundArticle) {
-          setError('Article non trouvé');
-          setLoading(false);
-          return;
-        }
-        
-        setArticle(foundArticle);
-        
+
+        // ajouter les vue de l'article ---------------
         // Vérifier si l'article a déjà été vu dans cette session
-        const viewedArticles = JSON.parse(localStorage.getItem('viewedArticles') || '{}');
-        const hasBeenViewed = viewedArticles[foundArticle.id];
+        // const viewedArticles = JSON.parse(localStorage.getItem('viewedArticles') || '{}');
+        // const hasBeenViewed = viewedArticles[foundArticle.id];
         
-        if (!hasBeenViewed) {
+        // if (!hasBeenViewed) {
           // Incrémenter le compteur de vues seulement si pas encore vu
           await articleService.incrementViewCount(foundArticle.id);
           
@@ -131,10 +70,11 @@ export default function ArticleDetailPage() {
           await pageViewService.recordPageView(foundArticle.id);
           
           // Marquer l'article comme vu
-          viewedArticles[foundArticle.id] = true;
-          localStorage.setItem('viewedArticles', JSON.stringify(viewedArticles));
-        }
-        
+          // viewedArticles[foundArticle.id] = true;
+          // localStorage.setItem('viewedArticles', JSON.stringify(viewedArticles));
+        // }
+        // finajout des vues--------------------------------------------
+
         // Récupérer les commentaires approuvés pour cet article
         const allComments = await CommentService.getCommentsByArticleId(foundArticle.id);
         const approvedComments = allComments.filter(
